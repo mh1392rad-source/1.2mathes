@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حل معادلات درجه یک و دو</title>
+    <style>
+        /* استایل‌های قبلی به علاوه استایل‌های جدید */
+        .equation-input {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.2rem;
+            border: 2px solid #d1d9e6;
+            border-radius: 16px;
+            text-align: center;
+            direction: ltr;
+            background: #f8fafc;
+            transition: 0.3s;
+        }
+        .equation-input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 4px #bfdbfe;
+            background: #ffffff;
+        }
+        .hint-text {
+            font-size: 0.85rem;
+            color: #64748b;
+            text-align: center;
+            margin-top: 5px;
+        }
+        .member-check {
+            background: #fef3c7;
+            border: 2px solid #f59e0b;
+            border-radius: 16px;
+            padding: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .member-check .btn {
+            background: #f59e0b;
+            border-color: #f59e0b;
+            color: white;
+        }
+        .member-check .btn:hover {
+            background: #d97706;
+        }
+        .member-status {
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 60px;
+            display: inline-block;
+        }
+        .status-ok {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .status-not {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        .status-checking {
+            background: #e0e7ff;
+            color: #3730a3;
+        }
+        .channel-link {
+            color: #2563eb;
+            font-weight: 600;
+            text-decoration: none;
+        }
+        .channel-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>🧮 حل معادلات</h1>
+
+    <!-- بخش بررسی عضویت در کانال -->
+    <div class="member-check">
+        <h3 style="margin-top:0;">📢 برای استفاده از این ابزار، عضو کانال شوید</h3>
+        <p style="margin:8px 0;">
+            <a href="https://eitaa.com/irandigital_python" target="_blank" class="channel-link">
+                📱 عضویت در کانال آموزش پایتون و هوش مصنوعی
+            </a>
+        </p>
+        <button class="btn" id="checkMemberBtn">✅ بررسی عضویت</button>
+        <div id="memberStatus" style="margin-top:12px;">
+            <span class="member-status status-checking">⏳ لطفاً بررسی کنید</span>
+        </div>
+        <p style="font-size:0.8rem; color:#64748b; margin-top:8px;">
+            * پس از عضویت، روی دکمه "بررسی عضویت" کلیک کنید
+        </p>
+    </div>
+
+    <!-- بخش ورود (Login) ساده -->
+    <div class="login-section" id="loginSection">
+        <h2 style="margin:0; font-size:1.5rem;">🔐 صفحه ورود</h2>
+        <div class="form-group">
+            <div class="input-row">
+                <label for="username">👤 نام کاربری</label>
+                <input type="text" id="username" placeholder="admin" value="admin">
+            </div>
+            <div class="input-row">
+                <label for="password">🔑 رمز عبور</label>
+                <input type="password" id="password" placeholder="••••••••" value="1234">
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-primary" id="loginBtn">ورود</button>
+                <button class="btn btn-outline" id="logoutBtn">خروج</button>
+            </div>
+            <div id="loginMessage" style="text-align:center; margin-top:6px; min-height:28px;"></div>
+        </div>
+    </div>
+
+    <!-- بخش حل معادلات -->
+    <div id="solverSection" style="display: none;">
+        <!-- معادله درجه یک -->
+        <div class="solver-section">
+            <h2>📐 حل معادله درجه یک</h2>
+            <div class="form-group">
+                <div class="input-row" style="flex-direction: column; align-items: stretch;">
+                    <label for="linearEquation" style="text-align:center;">معادله را وارد کنید (مثلاً 2x+3=0):</label>
+                    <input type="text" id="linearEquation" class="equation-input" placeholder="مثال: 2x+3=0" value="2x-4=0">
+                    <div class="hint-text">فرمت: ax+b=0 (از علامت + یا - استفاده کنید)</div>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-success" id="solveLinearBtn">✅ حل معادله</button>
+                    <button class="btn btn-outline" id="clearLinearBtn">🔄 پاک کردن</button>
+                </div>
+                <div class="result-box" id="linearResult">x = ?</div>
+            </div>
+        </div>
+
+        <!-- معادله درجه دو -->
+        <div class="solver-section">
+            <h2>📊 حل معادله درجه دو</h2>
+            <div class="form-group">
+                <div class="input-row" style="flex-direction: column; align-items: stretch;">
+                    <label for="quadEquation" style="text-align:center;">معادله را وارد کنید (مثلاً x^2-3x+2=0):</label>
+                    <input type="text" id="quadEquation" class="equation-input" placeholder="مثال: x^2-3x+2=0" value="x^2-3x+2=0">
+                    <div class="hint-text">فرمت: ax^2+bx+c=0 (از علامت + یا - استفاده کنید، ^ برای توان)</div>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-success" id="solveQuadBtn">✅ حل معادله</button>
+                    <button class="btn btn-outline" id="clearQuadBtn">🔄 پاک کردن</button>
+                </div>
+                <div class="result-box" id="quadResult">ریشه‌ها: ?</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- بخش نمایش سازنده و لینک کانال -->
+    <div class="footer-credit">
+        <span>ساخته شده توسط </span>
+        <span class="creator-name">محمد حسین حبیبی راد</span>
+        <br>
+        <span>🔗 کانال آموزش پایتون و هوش مصنوعی:</span>
+        <br>
+        <a href="https://eitaa.com/irandigital_python" target="_blank" rel="noopener noreferrer">
+            https://eitaa.com/irandigital_python
+        </a>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // ---------- عناصر DOM ----------
+        const loginSection = document.getElementById('loginSection');
+        const solverSection = document.getElementById('solverSection');
+        const loginStatus = document.getElementById('loginStatus');
+        const loginMessage = document.getElementById('loginMessage');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const loginBtn = document.getElementById('loginBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+
+        // ورودی‌های معادلات
+        const linearEquation = document.getElementById('linearEquation');
+        const quadEquation = document.getElementById('quadEquation');
+        const linearResult = document.getElementById('linearResult');
+        const quadResult = document.getElementById('quadResult');
+        const solveLinearBtn = document.getElementById('solveLinearBtn');
+        const clearLinearBtn = document.getElementById('clearLinearBtn');
+        const solveQuadBtn = document.getElementById('solveQuadBtn');
+        const clearQuadBtn = document.getElementById('clearQuadBtn');
+
+        // عناصر بررسی عضویت
+        const checkMemberBtn = document.getElementById('checkMemberBtn');
+        const memberStatus = document.getElementById('memberStatus');
+
+        // ---------- وضعیت‌ها ----------
+        let isLoggedIn = false;
+        let isMember = false;
+
+        // ---------- بررسی عضویت در کانال ----------
+        function checkMembership() {
+            memberStatus.innerHTML = '<span class="member-status status-checking">⏳ در حال بررسی عضویت...</span>';
+            
+            // در یک برنامه واقعی، اینجا باید با API ایتا یا یک سرور ارتباط برقرار کنید
+            // اما در حالت فعلی، یک شبیه‌سازی انجام می‌دهیم
+            setTimeout(() => {
+                // برای شبیه‌سازی، کاربر باید دکمه را بزند و ما فرض می‌کنیم عضو شده
+                // در عمل، باید از طریق API عضویت را بررسی کنید
+                const isMemberNow = true; // اینجا باید نتیجه واقعی از API بیاید
+                
+                if (isMemberNow) {
+                    isMember = true;
+                    memberStatus.innerHTML = '<span class="member-status status-ok">✅ شما عضو کانال هستید!</span>';
+                    // اگر قبلاً لاگین کرده، بخش حل معادلات را فعال کن
+                    if (isLoggedIn) {
+                        solverSection.style.display = 'block';
+                    }
+                } else {
+                    isMember = false;
+                    memberStatus.innerHTML = `
+                        <span class="member-status status-not">❌ شما عضو کانال نیستید!</span>
+                        <br>
+                        <a href="https://eitaa.com/irandigital_python" target="_blank" class="channel-link">
+                            برای عضویت کلیک کنید
+                        </a>
+                    `;
+                    solverSection.style.display = 'none';
+                }
+            }, 1500);
+        }
+
+        checkMemberBtn.addEventListener('click', checkMembership);
+
+        // در ابتدا، بررسی عضویت را انجام بده
+        setTimeout(checkMembership, 500);
+
+        // ---------- تابع تبدیل معادله به ضرایب ----------
+        function parseLinearEquation(equation) {
+            // حذف فاصله‌ها و تبدیل به فرمت استاندارد
+            let eq = equation.replace(/\s/g, '');
+            
+            // اگر معادله شامل = نبود، اضافه کن
+            if (!eq.includes('=')) {
+                eq += '=0';
+            }
+            
+            // جداسازی دو طرف معادله
+            let parts = eq.split('=');
+            let left = parts[0];
+            let right = parts.length > 1 ? parts[1] : '0';
+            
+            // انتقال همه چیز به چپ: left - right = 0
+            let full = left + '-' + right;
+            
+            // اگر با - شروع شد، اصلاح کن
+            if (full.startsWith('-')) {
+                full = '0' + full;
+            }
+            
+            // استخراج ضریب a (x)
+            let a = 0, b = 0;
+            
+            // الگوی a*x یا ax یا a x
+            const xPattern = /([+-]?\d*\.?\d*)\s*\*?\s*x/;
+            const matchX = full.match(xPattern);
+            if (matchX) {
+                let coef = matchX[1];
+                if (coef === '' || coef === '+') coef = '1';
+                else if (coef === '-') coef = '-1';
+                a = parseFloat(coef) || 0;
+                // حذف عبارت x از معادله
+                full = full.replace(matchX[0], '');
+            }
+            
+            // عدد ثابت (b)
+            full = full.replace(/[+-]/g, function(m) { return ' ' + m; });
+            const numbers = full.match(/[+-]?\d*\.?\d+/g);
+            if (numbers) {
+                for (let num of numbers) {
+                    if (num.trim() !== '') {
+                        b += parseFloat(num) || 0;
+                    }
+                }
+            }
+            
+            return { a, b };
+        }
+
+        function parseQuadEquation(equation) {
+            // حذف فاصله‌ها
+            let eq = equation.replace(/\s/g, '');
+            
+            if (!eq.includes('=')) {
+                eq += '=0';
+            }
+            
+            let parts = eq.split('=');
+            let left = parts[0];
+            let right = parts.length > 1 ? parts[1] : '0';
+            
+            let full = left + '-' + right;
+            if (full.startsWith('-')) {
+                full = '0' + full;
+            }
+            
+            let a = 0, b = 0, c = 0;
+            
+            // استخراج ضریب x^2
+            const x2Pattern = /([+-]?\d*\.?\d*)\s*\*?\s*x\^2/;
+            const matchX2 = full.match(x2Pattern);
+            if (matchX2) {
+                let coef = matchX2[1];
+                if (coef === '' || coef === '+') coef = '1';
+                else if (coef === '-') coef = '-1';
+                a = parseFloat(coef) || 0;
+                full = full.replace(matchX2[0], '');
+            }
+            
+            // استخراج ضریب x
+            const xPattern = /([+-]?\d*\.?\d*)\s*\*?\s*x(?!\^)/;
+            const matchX = full.match(xPattern);
+            if (matchX) {
+                let coef = matchX[1];
+                if (coef === '' || coef === '+') coef = '1';
+                else if (coef === '-') coef = '-1';
+                b = parseFloat(coef) || 0;
+                full = full.replace(matchX[0], '');
+            }
+            
+            // عدد ثابت
+            full = full.replace(/[+-]/g, function(m) { return ' ' + m; });
+            const numbers = full.match(/[+-]?\d*\.?\d+/g);
+            if (numbers) {
+                for (let num of numbers) {
+                    if (num.trim() !== '') {
+                        c += parseFloat(num) || 0;
+                    }
+                }
+            }
+            
+            return { a, b, c };
+        }
+
+        // ---------- توابع حل معادلات ----------
+        function solveLinear() {
+            if (!isLoggedIn) {
+                linearResult.innerText = '⚠️ ابتدا وارد شوید!';
+                return;
+            }
+            if (!isMember) {
+                linearResult.innerText = '⚠️ ابتدا عضو کانال شوید!';
+                return;
+            }
+
+            try {
+                const eq = linearEquation.value;
+                const { a, b } = parseLinearEquation(eq);
+                
+                if (isNaN(a) || isNaN(b)) {
+                    linearResult.innerText = '❌ فرمت معادله نامعتبر است.';
+                    return;
+                }
+
+                if (a === 0) {
+                    if (b === 0) {
+                        linearResult.innerText = '♾️ بی‌نهایت جواب (0=0)';
+                    } else {
+                        linearResult.innerText = '⚠️ معادله بی‌جواب است. (a=0)';
+                    }
+                    return;
+                }
+
+                const x = -b / a;
+                const formatted = Number.isInteger(x) ? x : x.toFixed(6);
+                linearResult.innerText = `✅ x = ${formatted}`;
+            } catch (e) {
+                linearResult.innerText = '❌ خطا در خواندن معادله. فرمت صحیح را وارد کنید.';
+            }
+        }
+
+        function solveQuadratic() {
+            if (!isLoggedIn) {
+                quadResult.innerText = '⚠️ ابتدا وارد شوید!';
+                return;
+            }
+            if (!isMember) {
+                quadResult.innerText = '⚠️ ابتدا عضو کانال شوید!';
+                return;
+            }
+
+            try {
+                const eq = quadEquation.value;
+                const { a, b, c } = parseQuadEquation(eq);
+                
+                if (isNaN(a) || isNaN(b) || isNaN(c)) {
+                    quadResult.innerText = '❌ فرمت معادله نامعتبر است.';
+                    return;
+                }
+
+                if (a === 0) {
+                    if (b === 0) {
+                        if (c === 0) {
+                            quadResult.innerText = '♾️ بی‌نهایت جواب (0=0)';
+                        } else {
+                            quadResult.innerText = '⚠️ معادله بی‌جواب است.';
+                        }
+                    } else {
+                        const x = -c / b;
+                        const formatted = Number.isInteger(x) ? x : x.toFixed(6);
+                        quadResult.innerText = `📌 معادله درجه یک: x = ${formatted}`;
+                    }
+                    return;
+                }
+
+                const delta = b * b - 4 * a * c;
+
+                if (delta < 0) {
+                    const realPart = (-b / (2 * a));
+                    const imagPart = Math.sqrt(-delta) / (2 * a);
+                    const realStr = Number.isInteger(realPart) ? realPart : realPart.toFixed(6);
+                    const imagStr = Number.isInteger(imagPart) ? imagPart : imagPart.toFixed(6);
+                    quadResult.innerText = `🔮 ریشه‌های مختلط: x₁ = ${realStr} + ${imagStr}i  ,  x₂ = ${realStr} - ${imagStr}i`;
+                    return;
+                }
+
+                if (delta === 0) {
+                    const x = -b / (2 * a);
+                    const formatted = Number.isInteger(x) ? x : x.toFixed(6);
+                    quadResult.innerText = `🔹 ریشه مضاعف: x = ${formatted}`;
+                    return;
+                }
+
+                const sqrtDelta = Math.sqrt(delta);
+                const x1 = (-b + sqrtDelta) / (2 * a);
+                const x2 = (-b - sqrtDelta) / (2 * a);
+                const f1 = Number.isInteger(x1) ? x1 : x1.toFixed(6);
+                const f2 = Number.isInteger(x2) ? x2 : x2.toFixed(6);
+                quadResult.innerText = `✅ ریشه‌ها: x₁ = ${f1}  ,  x₂ = ${f2}`;
+            } catch (e) {
+                quadResult.innerText = '❌ خطا در خواندن معادله. فرمت صحیح را وارد کنید.';
+            }
+        }
+
+        // ---------- توابع لاگین ----------
+        function setLoginState(state) {
+            isLoggedIn = state;
+            if (isLoggedIn && isMember) {
+                solverSection.style.display = 'block';
+                loginMessage.innerHTML = '<span style="color: #065f46;">✔️ ورود موفق! اکنون می‌توانید معادلات را حل کنید.</span>';
+            } else if (isLoggedIn && !isMember) {
+                solverSection.style.display = 'none';
+                loginMessage.innerHTML = '<span style="color: #d97706;">⚠️ شما عضو کانال نیستید. لطفاً ابتدا عضو شوید.</span>';
+            } else {
+                solverSection.style.display = 'none';
+                loginMessage.innerHTML = '<span style="color: #b91c1c;">❌ برای حل معادلات وارد شوید.</span>';
+            }
+        }
+
+        function validateLogin(username, password) {
+            return (username.trim() === 'admin' && password.trim() === '1234');
+        }
+
+        // ---------- رویدادها ----------
+        loginBtn.addEventListener('click', function() {
+            const user = usernameInput.value;
+            const pass = passwordInput.value;
+            if (validateLogin(user, pass)) {
+                setLoginState(true);
+            } else {
+                loginMessage.innerHTML = '<span class="error-message">❌ نام کاربری یا رمز عبور نادرست است.</span>';
+                setLoginState(false);
+            }
+        });
+
+        logoutBtn.addEventListener('click', function() {
+            setLoginState(false);
+            loginMessage.innerHTML = '<span style="color: #475569;">🚪 خارج شدید.</span>';
+        });
+
+        solveLinearBtn.addEventListener('click', solveLinear);
+        clearLinearBtn.addEventListener('click', function() {
+            linearEquation.value = '';
+            linearResult.innerText = 'x = ?';
+        });
+
+        solveQuadBtn.addEventListener('click', solveQuadratic);
+        clearQuadBtn.addEventListener('click', function() {
+            quadEquation.value = '';
+            quadResult.innerText = 'ریشه‌ها: ?';
+        });
+
+        // ---------- مقداردهی اولیه ----------
+        setLoginState(false);
+        linearEquation.value = '2x-4=0';
+        quadEquation.value = 'x^2-3x+2=0';
+        linearResult.innerText = 'x = ?';
+        quadResult.innerText = 'ریشه‌ها: ?';
+    })();
+</script>
+</body>
+</html>
